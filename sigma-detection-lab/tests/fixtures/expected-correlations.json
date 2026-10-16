@@ -1,0 +1,7 @@
+{
+  "ssh_password_guessing": {
+    "group_by": ["src"],
+    "groups": [["203.0.113.10"]],
+    "why": "3 failures from 203.0.113.10 in one 5-minute bucket fire; 198.51.100.7 has 2 failures 10 minutes apart and must not"
+  }
+}

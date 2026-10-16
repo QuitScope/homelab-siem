@@ -1,0 +1,69 @@
+<form version="1.1" theme="dark">
+  <label>HomeLab Security Overview</label>
+  <!-- All panels exclude the synthetic test runs (data-reduction measurement, Sigma live test).
+       Login panels only use authentication events; sudo/useradd events have no src by schema. -->
+  <fieldset submitButton="false">
+    <input type="time" token="t">
+      <label>Zeitraum</label>
+      <default><earliest>-24h</earliest><latest>now</latest></default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Gesamte Events</title>
+      <single>
+        <search><query>index=homelab_auth sourcetype=homelab:auth NOT host IN (lab-reduce-*, sigma-live-*) | stats count</query><earliest>$t.earliest$</earliest><latest>$t.latest$</latest></search>
+      </single>
+    </panel>
+    <panel>
+      <title>Fehlgeschlagene Logins</title>
+      <single>
+        <search><query>index=homelab_auth sourcetype=homelab:auth action=failure NOT event_type IN (sudo, user_created, group_created) NOT host IN (lab-reduce-*, sigma-live-*) | stats count</query><earliest>$t.earliest$</earliest><latest>$t.latest$</latest></search>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Login-Aktivität über Zeit</title>
+      <chart>
+        <search><query>index=homelab_auth sourcetype=homelab:auth action=* NOT event_type IN (sudo, user_created, group_created) NOT host IN (lab-reduce-*, sigma-live-*) | timechart count by action</query><earliest>$t.earliest$</earliest><latest>$t.latest$</latest></search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Fehlgeschlagene Anmeldungen (Klick = Rohevents)</title>
+      <table>
+        <search><query>index=homelab_auth sourcetype=homelab:auth action=failure NOT event_type IN (sudo, user_created, group_created) NOT host IN (lab-reduce-*, sigma-live-*) | stats count AS failures latest(_time) AS last_seen by src, user, dest | convert ctime(last_seen) | sort - failures</query><earliest>$t.earliest$</earliest><latest>$t.latest$</latest></search>
+        <drilldown>
+          <link target="_blank">search?q=search%20index%3Dhomelab_auth%20src%3D$row.src|u$%20user%3D$row.user|u$%20dest%3D$row.dest|u$&amp;earliest=$t.earliest|u$&amp;latest=$t.latest|u$</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <title>Top-Hosts nach Event-Volumen</title>
+      <table>
+        <search><query>index=homelab_auth sourcetype=homelab:auth NOT host IN (lab-reduce-*, sigma-live-*) | top limit=10 host</query><earliest>$t.earliest$</earliest><latest>$t.latest$</latest></search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Sigma-Detections (ausgelöste Alerts)</title>
+      <table>
+        <search><query>index=_internal sourcetype=scheduler savedsearch_name="Sigma - *" result_count&gt;0 | stats count AS alert_runs sum(result_count) AS hits latest(_time) AS last_hit by savedsearch_name | sort - last_hit | convert ctime(last_hit) | rename savedsearch_name AS detection</query><earliest>$t.earliest$</earliest><latest>$t.latest$</latest></search>
+        <drilldown>
+          <link target="_blank">/app/search/triggered_alerts</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <title>Privilegierte Aktivität (sudo, neue Konten)</title>
+      <table>
+        <search><query>index=homelab_auth sourcetype=homelab:auth event_type IN (sudo, user_created) NOT host IN (lab-reduce-*, sigma-live-*) | sort - _time | table _time host event_type user target_user command action</query><earliest>$t.earliest$</earliest><latest>$t.latest$</latest></search>
+      </table>
+    </panel>
+  </row>
+</form>

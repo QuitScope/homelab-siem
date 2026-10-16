@@ -1,0 +1,64 @@
+title: SSH Authentication Failure
+id: 0fa37bd4-0eca-4626-833f-d18a6e181d33
+name: ssh_auth_failure
+status: test
+description: |
+  A single failed SSH authentication (wrong password, unknown user, rejected key) on a Linux host.
+  Building block for the password-guessing correlation below; on its own it is low severity because
+  mistyped passwords are common.
+  Source data: sshd syslog lines ("Failed password ...", "Invalid user ...") normalized by the Cribl
+  pipeline homelab_auth_normalize (docs/data-schema.md). Required fields: event_type, service, action, src, user.
+references:
+  - https://attack.mitre.org/techniques/T1110/001/
+author: QuitScope
+date: 2026-10-15
+tags:
+  - attack.credential-access
+  - attack.t1110.001
+logsource:
+  product: linux
+  service: sshd
+detection:
+  selection:
+    event_type: authentication
+    service: ssh
+    action: failure
+  condition: selection
+fields:
+  - event_time
+  - user
+  - src
+  - dest
+falsepositives:
+  - Users mistyping their password
+  - Monitoring or automation with outdated credentials
+level: low
+---
+title: SSH Password Guessing From Single Source
+id: e967f401-4764-4e38-8993-5dcb7730ce59
+name: ssh_password_guessing
+status: test
+description: |
+  Three or more failed SSH authentications from the same source address within 5 minutes.
+  Mirrors the existing Splunk alert "HomeLab - Repeated Failed Logins".
+references:
+  - https://attack.mitre.org/techniques/T1110/001/
+author: QuitScope
+date: 2026-10-15
+tags:
+  - attack.credential-access
+  - attack.t1110.001
+correlation:
+  type: event_count
+  rules:
+    - ssh_auth_failure
+  group-by:
+    - src
+  timespan: 5m
+  generate: true
+  condition:
+    gte: 3
+falsepositives:
+  - A user retrying a forgotten password several times
+  - Vulnerability scanners in the lab network
+level: medium

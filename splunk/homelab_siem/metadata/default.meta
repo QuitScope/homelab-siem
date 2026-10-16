@@ -1,0 +1,4 @@
+# Share dashboard and alert globally so they show up in Search & Reporting
+[]
+access = read : [ * ], write : [ admin ]
+export = system

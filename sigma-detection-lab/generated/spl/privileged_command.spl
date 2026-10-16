@@ -1,0 +1,1 @@
+index="homelab_auth" sourcetype="homelab:auth" event_type="sudo" action="success" command IN ("*/etc/shadow*", "*/etc/gshadow*", "*/etc/sudoers*", "*visudo*") | table event_time,user,target_user,command,dest

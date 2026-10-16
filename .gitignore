@@ -1,0 +1,9 @@
+.env
+# personal planning notes, not part of the project
+konzept.txt
+# Python / uv
+.venv/
+__pycache__/
+.pytest_cache/
+# deployed copy of sigma-detection-lab/generated/savedsearches.conf (source of truth is the generated file)
+splunk/homelab_siem/local/

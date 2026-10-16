@@ -1,0 +1,35 @@
+# TODO: images use :latest tags, pin versions once the setup is stable
+services:
+  cribl:
+    image: cribl/cribl:latest
+    restart: unless-stopped
+    environment:
+      CRIBL_VOLUME_DIR: /opt/cribl/config-volume
+    volumes:
+      - cribl-config:/opt/cribl/config-volume
+    ports:
+      - "9000:9000"   # Cribl UI
+      - "10080:10080" # HTTP source (test events)
+      - "9514:9514/udp" # syslog source (sshd auth logs from lab-linux-01)
+
+  splunk:
+    image: splunk/splunk:latest
+    restart: unless-stopped
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_GENERAL_TERMS: --accept-sgt-current-at-splunk-com
+      SPLUNK_PASSWORD: ${SPLUNK_PASSWORD}
+      SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN}
+      SPLUNK_HEC_SSL: "false"
+    volumes:
+      - splunk-etc:/opt/splunk/etc
+      - splunk-var:/opt/splunk/var
+      - ./splunk/homelab_siem:/opt/splunk/etc/apps/homelab_siem
+    ports:
+      - "8000:8000" # Splunk Web
+    # HEC (8088) deliberately not published: only Cribl reaches it via http://splunk:8088
+
+volumes:
+  cribl-config:
+  splunk-etc:
+  splunk-var:

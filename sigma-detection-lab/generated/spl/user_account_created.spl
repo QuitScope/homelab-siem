@@ -1,0 +1,1 @@
+index="homelab_auth" sourcetype="homelab:auth" event_type="user_created" | table event_time,target_user,dest

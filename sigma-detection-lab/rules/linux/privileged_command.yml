@@ -1,0 +1,46 @@
+title: Sudo Command On Credential Or Sudoers Files
+id: 652b9997-f46f-44f2-8432-3ca55555b1d2
+name: privileged_command
+status: test
+description: |
+  A user ran a command via sudo whose command line references /etc/shadow, /etc/gshadow or the sudoers
+  configuration (/etc/sudoers, /etc/sudoers.d/, visudo). Reading shadow files exposes password hashes;
+  changing sudoers grants persistent root rights.
+  Source data: sudo's own syslog line ("<user> : ... USER=<target> ; COMMAND=<cmd>"), normalized by the
+  Cribl pipeline. Required fields: event_type, action, user, target_user, command.
+  sudo logs the command it authorized, not what the process did afterwards. Commands run inside a root
+  shell (sudo -s / sudo -i) are NOT visible here; that needs sudo I/O logging or auditd execve events.
+references:
+  - https://attack.mitre.org/techniques/T1003/008/
+  - https://attack.mitre.org/techniques/T1548/003/
+author: QuitScope
+date: 2026-10-15
+tags:
+  - attack.credential-access
+  - attack.t1003.008
+  - attack.privilege-escalation
+  - attack.t1548.003
+logsource:
+  product: linux
+  service: sudo
+detection:
+  selection:
+    event_type: sudo
+    action: success
+  sensitive_target:
+    command|contains:
+      - /etc/shadow
+      - /etc/gshadow
+      - /etc/sudoers
+      - visudo
+  condition: selection and sensitive_target
+fields:
+  - event_time
+  - user
+  - target_user
+  - command
+  - dest
+falsepositives:
+  - Administrators intentionally editing sudoers with visudo
+  - Configuration management (Ansible, Puppet) templating sudoers files
+level: high

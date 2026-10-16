@@ -1,0 +1,32 @@
+name: HomeLab normalized auth schema (Cribl -> Splunk index homelab_auth)
+priority: 100
+transformations:
+  # Rules use the normalized field names 1:1 (docs/data-schema.md), so no field mapping is needed.
+  # Instead, conversion fails if a rule uses a field the Cribl pipeline does not produce.
+  - id: schema_guard
+    type: detection_item_failure
+    message: Field is not part of the normalized HomeLab schema (docs/data-schema.md)
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - event_time
+          - event_type
+          - host
+          - user
+          - target_user
+          - src
+          - dest
+          - action
+          - service
+          - command
+          - environment
+    field_name_cond_not: true
+  # Where the events live in Splunk; change here if your index/sourcetype differ.
+  - id: homelab_index
+    type: add_condition
+    conditions:
+      index: homelab_auth
+      sourcetype: "homelab:auth"
+    rule_conditions:
+      - type: logsource
+        product: linux

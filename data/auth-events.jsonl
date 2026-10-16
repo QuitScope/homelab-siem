@@ -1,0 +1,5 @@
+{"event_time":"2026-10-15T10:00:00Z","host":"lab-linux-01","user":"alice","src":"192.0.2.10","dest":"lab-linux-01","action":"success","service":"ssh","environment":"homelab"}
+{"event_time":"2026-10-15T10:01:00Z","host":"lab-linux-01","user":"bob","src":"192.0.2.20","dest":"lab-linux-01","action":"failure","service":"ssh","environment":"homelab"}
+{"event_time":"2026-10-15T10:01:10Z","host":"lab-linux-01","user":"bob","src":"192.0.2.20","dest":"lab-linux-01","action":"failure","service":"ssh","environment":"homelab"}
+{"event_time":"2026-10-15T10:01:20Z","host":"lab-linux-01","user":"bob","src":"192.0.2.20","dest":"lab-linux-01","action":"failure","service":"ssh","environment":"homelab"}
+{"event_time":"2026-10-15T10:02:00Z","host":"lab-linux-01","user":"bob","src":"192.0.2.20","dest":"lab-linux-01","action":"success","service":"ssh","environment":"homelab"}

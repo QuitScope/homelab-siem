@@ -1,0 +1,33 @@
+title: Local User Account Created
+id: 748c936b-218c-4115-a669-1107560a75b2
+name: user_account_created
+status: test
+description: |
+  A new local user account was created on a Linux host.
+  Source data: the shadow-utils syslog line "useradd[pid]: new user: name=<name>, UID=..." (also written when
+  Debian/Ubuntu adduser calls useradd), normalized by the Cribl pipeline to event_type=user_created.
+  Required fields: event_type, target_user, dest. The "new group" line written in the same call is not a match.
+  Accounts added by editing /etc/passwd directly or by tools that bypass useradd are NOT detected; that needs
+  auditd file watches on /etc/passwd.
+references:
+  - https://attack.mitre.org/techniques/T1136/001/
+author: QuitScope
+date: 2026-10-15
+tags:
+  - attack.persistence
+  - attack.t1136.001
+logsource:
+  product: linux
+  service: auth
+detection:
+  selection:
+    event_type: user_created
+  condition: selection
+fields:
+  - event_time
+  - target_user
+  - dest
+falsepositives:
+  - Planned onboarding of new users
+  - Package installation creating system/service accounts
+level: medium
