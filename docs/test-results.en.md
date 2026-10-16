@@ -20,18 +20,18 @@ Bug found and fixed: `host` was multivalue in Splunk (index-time metadata + JSON
 
 ## Real SSH logs (lab-linux-01 → rsyslog UDP 9514 → Cribl)
 
-From the workstation (`<admin-pc>`): three logins with unknown users (`mallory`, `eve`, `oscar`) and one
+From the workstation (`<ADMIN-PC-IP>`): three logins with unknown users (`mallory`, `eve`, `oscar`) and one
 key-based root login against `lab-linux-01`.
 
 | sshd line | Splunk (`homelab_auth`) |
 |---|---|
-| `Invalid user mallory from <admin-pc> port …` | `user=mallory src=<admin-pc> action=failure service=ssh` |
-| `Accepted publickey for root from <admin-pc> port …` | `user=root src=<admin-pc> action=success service=ssh` |
+| `Invalid user mallory from <ADMIN-PC-IP> port …` | `user=mallory src=<ADMIN-PC-IP> action=failure service=ssh` |
+| `Accepted publickey for root from <ADMIN-PC-IP> port …` | `user=root src=<ADMIN-PC-IP> action=success service=ssh` |
 
 Non-auth sshd lines and all other syslog traffic hit no route and are not forwarded.
 
 Alert on real logs: scheduler run 17:20 UTC `result_count=1` →
-`ALERT repeated failed logins src=<admin-pc> dest=lab-linux-01 failures=3` (17:15 run before the test: 0).
+`ALERT repeated failed logins src=<ADMIN-PC-IP> dest=lab-linux-01 failures=3` (17:15 run before the test: 0).
 
 ## Data reduction
 

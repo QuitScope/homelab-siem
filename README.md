@@ -28,6 +28,8 @@ Anmeldung zu verlieren ([Messung](docs/test-results.md#data-reduction)).
 
 ## Einrichtung
 
+Die Befehle laufen auf der VM `siem-docker`, im Text steht dafür `<VM-IP>`.
+
 ```bash
 # auf dem Proxmox-Host (oder ein vorhandenes Cloud-Init-Template klonen)
 SSHKEY=/root/key.pub ./scripts/create-vm.sh
@@ -40,8 +42,8 @@ set -a; . ./.env; set +a; python3 scripts/cribl-setup.py   # Source, Pipeline, R
 
 | Oberfläche | URL | Login |
 |---|---|---|
-| Cribl Stream | `http://<vm>:9000` | `admin` / `admin`, beim ersten Login ändern (danach `CRIBL_PASSWORD` in `.env`) |
-| Splunk | `http://<vm>:8000` | `admin` / `SPLUNK_PASSWORD` aus `.env` |
+| Cribl Stream | `http://<VM-IP>:9000` | `admin` / `admin`, beim ersten Login ändern (danach `CRIBL_PASSWORD` in `.env`) |
+| Splunk | `http://<VM-IP>:8000` | `admin` / `SPLUNK_PASSWORD` aus `.env` |
 
 Die Splunk-Seite liegt als Code in [`splunk/homelab_siem`](splunk/homelab_siem/default): Index, `props.conf`,
 Dashboard, Alert und Datenqualitäts-Suche. Die Cribl-Seite liegt als Code in
@@ -62,12 +64,12 @@ Dashboard, Alert und Datenqualitäts-Suche. Die Cribl-Seite liegt als Code in
 ```bash
 ./scripts/send-events.sh 3   # 3 Fehler in 5 Min → Alert muss auslösen
 ./scripts/send-events.sh 2   # 2 Fehler          → Alert muss still bleiben
-curl --data-binary @data/auth-events.jsonl http://<vm>:10080/cribl/_bulk   # statischer Beispieldatensatz
+curl --data-binary @data/auth-events.jsonl http://<VM-IP>:10080/cribl/_bulk   # statischer Beispieldatensatz
 python3 scripts/reduction-test.py 1000   # Data-Reduction-Messung (auf der VM, .env geladen)
 ```
 
 Echte Quelle: auf `lab-linux-01` `rsyslog` installieren und
-`auth,authpriv.* @<siem-vm>:9514` in `/etc/rsyslog.d/90-cribl.conf` eintragen.
+`auth,authpriv.* @<VM-IP>:9514` in `/etc/rsyslog.d/90-cribl.conf` eintragen.
 
 Ergebnisse: [docs/test-results.md](docs/test-results.md).
 

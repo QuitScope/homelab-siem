@@ -20,18 +20,18 @@ Gefundener und behobener Fehler: `host` war in Splunk mehrwertig (Index-Metadate
 
 ## Echte SSH-Logs (lab-linux-01 → rsyslog UDP 9514 → Cribl)
 
-Vom Arbeitsplatz-PC (`<admin-pc>`): drei Anmeldeversuche mit unbekannten Benutzern (`mallory`, `eve`,
+Vom Arbeitsplatz-PC (`<ADMIN-PC-IP>`): drei Anmeldeversuche mit unbekannten Benutzern (`mallory`, `eve`,
 `oscar`) und eine schlüsselbasierte root-Anmeldung an `lab-linux-01`.
 
 | sshd-Zeile | Splunk (`homelab_auth`) |
 |---|---|
-| `Invalid user mallory from <admin-pc> port …` | `user=mallory src=<admin-pc> action=failure service=ssh` |
-| `Accepted publickey for root from <admin-pc> port …` | `user=root src=<admin-pc> action=success service=ssh` |
+| `Invalid user mallory from <ADMIN-PC-IP> port …` | `user=mallory src=<ADMIN-PC-IP> action=failure service=ssh` |
+| `Accepted publickey for root from <ADMIN-PC-IP> port …` | `user=root src=<ADMIN-PC-IP> action=success service=ssh` |
 
 sshd-Zeilen ohne Anmeldebezug und sonstiger Syslog-Verkehr treffen keine Route und werden nicht weitergeleitet.
 
 Alert auf echten Logs: Scheduler-Lauf 17:20 UTC `result_count=1` →
-`ALERT repeated failed logins src=<admin-pc> dest=lab-linux-01 failures=3` (Lauf 17:15 vor dem Test: 0).
+`ALERT repeated failed logins src=<ADMIN-PC-IP> dest=lab-linux-01 failures=3` (Lauf 17:15 vor dem Test: 0).
 
 <a id="data-reduction"></a>
 ## Data Reduction

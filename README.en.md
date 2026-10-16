@@ -28,6 +28,8 @@ log source). Result: 72.7 % fewer bytes and 27.3 % fewer events with zero failed
 
 ## Setup
 
+The commands run on the VM `siem-docker`; the docs refer to its address as `<VM-IP>`.
+
 ```bash
 # on the Proxmox host (or clone an existing cloud-init template)
 SSHKEY=/root/key.pub ./scripts/create-vm.sh
@@ -40,8 +42,8 @@ set -a; . ./.env; set +a; python3 scripts/cribl-setup.py   # source, pipeline, r
 
 | UI | URL | Login |
 |---|---|---|
-| Cribl Stream | `http://<vm>:9000` | `admin` / `admin`, change on first login (then set `CRIBL_PASSWORD` in `.env`) |
-| Splunk | `http://<vm>:8000` | `admin` / `SPLUNK_PASSWORD` from `.env` |
+| Cribl Stream | `http://<VM-IP>:9000` | `admin` / `admin`, change on first login (then set `CRIBL_PASSWORD` in `.env`) |
+| Splunk | `http://<VM-IP>:8000` | `admin` / `SPLUNK_PASSWORD` from `.env` |
 
 The Splunk side is code in [`splunk/homelab_siem`](splunk/homelab_siem/default): index, `props.conf`,
 dashboard, alert and data-quality search. The Cribl side is code in [`scripts/cribl-setup.py`](scripts/cribl-setup.py).
@@ -62,12 +64,12 @@ HEC (8088) is not published outside the Docker network.
 ```bash
 ./scripts/send-events.sh 3   # 3 failures in 5 min → alert must fire
 ./scripts/send-events.sh 2   # 2 failures         → alert must stay quiet
-curl --data-binary @data/auth-events.jsonl http://<vm>:10080/cribl/_bulk   # static sample set
+curl --data-binary @data/auth-events.jsonl http://<VM-IP>:10080/cribl/_bulk   # static sample set
 python3 scripts/reduction-test.py 1000   # data-reduction measurement (on the VM, .env loaded)
 ```
 
 Real source: on `lab-linux-01` install `rsyslog` and add
-`auth,authpriv.* @<siem-vm>:9514` to `/etc/rsyslog.d/90-cribl.conf`.
+`auth,authpriv.* @<VM-IP>:9514` to `/etc/rsyslog.d/90-cribl.conf`.
 
 See [docs/test-results.en.md](docs/test-results.en.md).
 

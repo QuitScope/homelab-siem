@@ -30,7 +30,7 @@
 | Validation | `scripts/validate-rules.sh` | `sigma check --fail-on-issues` |
 | Local tests | `tests/` (pytest) | metadata, conversion, drift of `generated/`, detection logic against fixtures |
 | Live test | `scripts/splunk-live-test.py` | fixtures through Cribl → Splunk, executes the generated SPL for real |
-| CI | `../.github/workflows/validate.yml` | validate, convert, drift check, pytest – no secrets, no deployment |
+| CI | `../.github/workflows/validate.yml` | validate, convert, drift check, pytest; needs no credentials and deploys nothing |
 | Normalization | `../scripts/cribl-setup.py` | Cribl pipeline producing the schema (part of the homelab repo) |
 
 ## What is checked locally, what in Splunk
